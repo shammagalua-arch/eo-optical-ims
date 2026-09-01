@@ -10,12 +10,13 @@ import { getFirestore }  from "https://www.gstatic.com/firebasejs/10.12.2/fireba
 
 // TODO: Replace with your actual Firebase config
 const firebaseConfig = {
-  apiKey:            "YOUR_API_KEY",
-  authDomain:        "YOUR_PROJECT_ID.firebaseapp.com",
-  projectId:         "YOUR_PROJECT_ID",
-  storageBucket:     "YOUR_PROJECT_ID.appspot.com",
-  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-  appId:             "YOUR_APP_ID"
+  apiKey: "AIzaSyBIMEfnNooGHHjsfglghsNi6yxGeXeRDI4",
+  authDomain: "eo-optical-ims.firebaseapp.com",
+  projectId: "eo-optical-ims",
+  storageBucket: "eo-optical-ims.firebasestorage.app",
+  messagingSenderId: "168452419885",
+  appId: "1:168452419885:web:f552afec11e4d1656623a4",
+  measurementId: "G-80783X85RL"
 };
 
 const app  = initializeApp(firebaseConfig);
