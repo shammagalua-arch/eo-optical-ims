@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Suppliers – EO Executive Optical IMS</title>
+  <link rel="stylesheet" href="css/style.css"/>
+</head>
+<body>
+<div id="toast-container" class="toast-container"></div>
+<div class="sidebar-overlay" id="sidebar-overlay"></div>
+<aside class="sidebar">
+  <div class="sidebar-header"><div class="sidebar-logo">👓</div><div class="sidebar-brand"><span class="sidebar-brand-name">EO Optical</span><span class="sidebar-brand-sub">Inventory System</span></div></div>
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">Main</div>
+    <a href="dashboard.html" class="nav-item"><span class="nav-icon">📊</span> Dashboard</a>
+    <a href="inventory.html" class="nav-item"><span class="nav-icon">👓</span> Inventory</a>
+    <a href="sales.html" class="nav-item"><span class="nav-icon">💰</span> Sales</a>
+    <div class="nav-section-label">Clinical</div>
+    <a href="prescriptions.html" class="nav-item"><span class="nav-icon">📋</span> Prescriptions</a>
+    <a href="customers.html" class="nav-item"><span class="nav-icon">👥</span> Customers</a>
+    <div class="nav-section-label">Management</div>
+    <a href="suppliers.html" class="nav-item active"><span class="nav-icon">🏭</span> Suppliers</a>
+    <div class="nav-section-label" data-min-role="Manager">Analytics</div>
+    <a href="reports.html" class="nav-item" data-min-role="Manager"><span class="nav-icon">📈</span> Reports</a>
+    <a href="logs.html" class="nav-item" data-role="Admin"><span class="nav-icon">📝</span> Activity Logs</a>
+  </nav>
+  <div class="sidebar-user">
+    <div class="user-avatar" id="sidebar-user-avatar">AD</div>
+    <div class="user-info"><div class="user-name" id="sidebar-user-name">Loading…</div><div class="user-role" id="sidebar-user-role">—</div></div>
+    <button class="btn-logout" id="btn-logout">🚪</button>
+  </div>
+</aside>
+
+<div class="main-content">
+  <header class="top-header">
+    <button class="sidebar-toggle" id="sidebar-toggle">☰</button>
+    <div class="header-title"><h1>Supplier Management</h1><p>Feature 5 — Eyewear and lens suppliers directory</p></div>
+    <div class="header-actions"><div class="header-time" id="live-clock"></div></div>
+  </header>
+  <div class="page-body">
+    <div id="blocked" class="blocked-page" style="display:none">
+      <div class="blocked-icon">🔒</div>
+      <h2>Access Restricted</h2>
+      <p>Suppliers page is for Managers and Admins only.</p>
+      <a href="dashboard.html" class="btn btn-primary" style="margin-top:1.5rem;display:inline-flex">← Dashboard</a>
+    </div>
+    <div id="page-content">
+      <div class="stats-grid mb-3">
+        <div class="stat-card" style="--stat-color:var(--primary)"><div class="stat-icon-wrap">🏭</div><div class="stat-info"><div class="stat-val" id="sup-total">—</div><div class="stat-label">Total Suppliers</div></div></div>
+        <div class="stat-card" style="--stat-color:#2ecc71"><div class="stat-icon-wrap">✅</div><div class="stat-info"><div class="stat-val" id="sup-active">—</div><div class="stat-label">Active</div></div></div>
+        <div class="stat-card" style="--stat-color:#f39c12"><div class="stat-icon-wrap">⏸️</div><div class="stat-info"><div class="stat-val" id="sup-inactive">—</div><div class="stat-label">Inactive</div></div></div>
+        <div class="stat-card" style="--stat-color:#3498db"><div class="stat-icon-wrap">🗂️</div><div class="stat-info"><div class="stat-val" id="sup-cats">—</div><div class="stat-label">Categories</div></div></div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title"><span class="card-title-icon">🏭</span> Supplier Directory</span>
+          <div class="flex gap-1 flex-wrap">
+            <div class="search-bar"><span class="search-icon">🔍</span><input type="text" id="sup-search" placeholder="Search suppliers…"/></div>
+            <select class="select-field" id="sup-status-f" style="width:auto"><option value="">All</option><option>Active</option><option>Inactive</option></select>
+            <button class="btn btn-primary btn-sm" id="btn-add-sup" data-role="Admin">+ Add Supplier</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table class="data-table" id="sup-table">
+            <thead><tr><th>#</th><th>Supplier Name</th><th>Contact Person</th><th>Phone</th><th>Email</th><th>Category</th><th>Status</th><th data-role="Admin">Actions</th></tr></thead>
+            <tbody id="sup-tbody"><tr><td colspan="8" style="text-align:center;padding:2rem" class="text-muted">Loading…</td></tr></tbody>
+          </table>
+        </div>
+        <div id="sup-pagination" style="padding:1rem;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--border)"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="sup-modal">
+  <div class="modal">
+    <div class="modal-header"><h3 id="sup-modal-title">Add Supplier</h3><button class="modal-close" id="sup-close">✕</button></div>
+    <div class="modal-body">
+      <input type="hidden" id="sup-edit-id"/>
+      <div class="form-grid">
+        <div class="input-group" style="grid-column:1/-1"><label class="input-label">Supplier Name *</label><input class="input-field" id="sup-name" placeholder="e.g. Luxottica Philippines"/></div>
+        <div class="input-group"><label class="input-label">Contact Person</label><input class="input-field" id="sup-contact" placeholder="Full name"/></div>
+        <div class="input-group"><label class="input-label">Phone</label><input class="input-field" id="sup-phone" placeholder="09XXXXXXXXX"/></div>
+        <div class="input-group"><label class="input-label">Email</label><input class="input-field" type="email" id="sup-email" placeholder="supplier@email.com"/></div>
+        <div class="input-group"><label class="input-label">Category</label><select class="select-field" id="sup-cat"><option>Frames</option><option>Lenses</option><option>Sunglasses</option><option>Contact Lenses</option><option>Accessories</option><option>General</option></select></div>
+        <div class="input-group"><label class="input-label">Status</label><select class="select-field" id="sup-status"><option>Active</option><option>Inactive</option></select></div>
+        <div class="input-group" style="grid-column:1/-1"><label class="input-label">Address</label><input class="input-field" id="sup-address" placeholder="Complete address"/></div>
+        <div class="input-group" style="grid-column:1/-1"><label class="input-label">Notes</label><textarea class="textarea-field" id="sup-notes" placeholder="Terms, lead time, notes…"></textarea></div>
+      </div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-secondary" id="sup-cancel">Cancel</button><button class="btn btn-primary" id="sup-save">💾 Save Supplier</button></div>
+  </div>
+</div>
+
+<script type="module">
+  import { requireAuth, logoutUser, populateSidebarUser, getCachedRole } from './js/auth.js';
+  import { startClock, showToast, initSidebarToggle, Paginator } from './js/app.js';
+  import { logActivity } from './js/logs.js';
+  import { db } from './js/firebase-config.js';
+  import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc, orderBy, query, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+  requireAuth(); populateSidebarUser(); startClock(); initSidebarToggle();
+  document.getElementById('btn-logout').addEventListener('click',()=>logoutUser());
+
+  let allSuppliers=[], paginator;
+
+  setTimeout(()=>{
+    const role=getCachedRole();
+    if(role==='Staff'||role==='Optometrist'){
+      document.getElementById('blocked').style.display='block';
+      document.getElementById('page-content').style.display='none';
+    } else { loadSuppliers(); }
+  },800);
+
+  async function loadSuppliers(){
+    const snap=await getDocs(query(collection(db,'suppliers'),orderBy('name')));
+    allSuppliers=snap.docs.map(d=>({id:d.id,...d.data()}));
+    applyFilters();
+    document.getElementById('sup-total').textContent=allSuppliers.length;
+    document.getElementById('sup-active').textContent=allSuppliers.filter(s=>s.status==='Active').length;
+    document.getElementById('sup-inactive').textContent=allSuppliers.filter(s=>s.status!=='Active').length;
+    document.getElementById('sup-cats').textContent=new Set(allSuppliers.map(s=>s.category)).size;
+  }
+
+  function applyFilters(){
+    const s=document.getElementById('sup-search').value.toLowerCase(),st=document.getElementById('sup-status-f').value;
+    const f=allSuppliers.filter(x=>(!s||(x.name||'').toLowerCase().includes(s))&&(!st||x.status===st));
+    paginator=new Paginator(f,15); renderPage(1);
+  }
+
+  function renderPage(n){
+    const items=paginator.getPage(n), canEdit=getCachedRole()==='Admin';
+    document.getElementById('sup-tbody').innerHTML=items.length?items.map((s,i)=>`<tr>
+      <td class="text-muted">${(paginator.current-1)*15+i+1}</td>
+      <td class="fw-600">${s.name||'—'}</td>
+      <td>${s.contact||'—'}</td>
+      <td class="text-secondary">${s.phone||'—'}</td>
+      <td class="text-secondary">${s.email||'—'}</td>
+      <td><span class="badge badge-gold">${s.category||'—'}</span></td>
+      <td><span class="badge ${s.status==='Active'?'badge-success':'badge-warning'}">${s.status||'Active'}</span></td>
+      <td>${canEdit?`<button class="btn btn-secondary btn-sm" onclick="editSup('${s.id}')">✏️</button> <button class="btn btn-danger btn-sm" onclick="delSup('${s.id}','${(s.name||'').replace(/'/g,"\\'")}')">🗑️</button>`:'—'}</td>
+    </tr>`).join(''):'<tr><td colspan="8" style="text-align:center;padding:2rem" class="text-muted">No suppliers found</td></tr>';
+    paginator.renderControls('sup-pagination',renderPage);
+  }
+
+  const modal=document.getElementById('sup-modal');
+  const openM=()=>modal.classList.add('show');
+  const closeM=()=>{ modal.classList.remove('show'); ['sup-edit-id','sup-name','sup-contact','sup-phone','sup-email','sup-address','sup-notes'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';}); document.getElementById('sup-status').value='Active'; document.getElementById('sup-modal-title').textContent='Add Supplier'; };
+
+  document.getElementById('btn-add-sup').addEventListener('click',openM);
+  document.getElementById('sup-close').addEventListener('click',closeM);
+  document.getElementById('sup-cancel').addEventListener('click',closeM);
+  modal.addEventListener('click',e=>{if(e.target===modal)closeM();});
+
+  document.getElementById('sup-save').addEventListener('click',async()=>{
+    const name=document.getElementById('sup-name').value.trim();
+    if(!name){showToast('Supplier name required.','warning');return;}
+    const editId=document.getElementById('sup-edit-id').value;
+    const data={name,contact:document.getElementById('sup-contact').value.trim(),phone:document.getElementById('sup-phone').value.trim(),email:document.getElementById('sup-email').value.trim(),category:document.getElementById('sup-cat').value,status:document.getElementById('sup-status').value,address:document.getElementById('sup-address').value.trim(),notes:document.getElementById('sup-notes').value.trim(),updatedAt:serverTimestamp()};
+    try{
+      if(editId){await updateDoc(doc(db,'suppliers',editId),data);await logActivity('SUPPLIERS',`Updated: ${name}`);showToast('Updated.','success');}
+      else{data.createdAt=serverTimestamp();await addDoc(collection(db,'suppliers'),data);await logActivity('SUPPLIERS',`Added: ${name}`);showToast('Added.','success');}
+      closeM(); loadSuppliers();
+    }catch(err){showToast('Error: '+err.message,'error');}
+  });
+
+  window.editSup=function(id){ const s=allSuppliers.find(x=>x.id===id);if(!s)return; document.getElementById('sup-edit-id').value=id; document.getElementById('sup-name').value=s.name||''; document.getElementById('sup-contact').value=s.contact||''; document.getElementById('sup-phone').value=s.phone||''; document.getElementById('sup-email').value=s.email||''; document.getElementById('sup-cat').value=s.category||'General'; document.getElementById('sup-status').value=s.status||'Active'; document.getElementById('sup-address').value=s.address||''; document.getElementById('sup-notes').value=s.notes||''; document.getElementById('sup-modal-title').textContent='Edit Supplier'; openM(); };
+  window.delSup=async function(id,name){ if(!confirm(`Delete "${name}"?`))return; try{await deleteDoc(doc(db,'suppliers',id));await logActivity('SUPPLIERS',`Deleted: ${name}`);showToast('Deleted.','success');loadSuppliers();}catch(err){showToast('Error: '+err.message,'error');} };
+
+  document.getElementById('sup-search').addEventListener('input',applyFilters);
+  document.getElementById('sup-status-f').addEventListener('change',applyFilters);
+</script>
+</body>
+</html>

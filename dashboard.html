@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard – EO Executive Optical IMS</title>
+  <link rel="stylesheet" href="css/style.css"/>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👓</text></svg>"/>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+</head>
+<body>
+<div id="toast-container" class="toast-container"></div>
+<div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+<aside class="sidebar">
+  <div class="sidebar-header">
+    <div class="sidebar-logo">👓</div>
+    <div class="sidebar-brand"><span class="sidebar-brand-name">EO Optical</span><span class="sidebar-brand-sub">Inventory System</span></div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">Main</div>
+    <a href="dashboard.html"    class="nav-item active"><span class="nav-icon">📊</span> Dashboard</a>
+    <a href="inventory.html"    class="nav-item"><span class="nav-icon">👓</span> Inventory</a>
+    <a href="sales.html"        class="nav-item"><span class="nav-icon">💰</span> Sales</a>
+    <div class="nav-section-label">Clinical</div>
+    <a href="prescriptions.html"class="nav-item"><span class="nav-icon">📋</span> Prescriptions</a>
+    <a href="customers.html"    class="nav-item"><span class="nav-icon">👥</span> Customers</a>
+    <div class="nav-section-label">Management</div>
+    <a href="suppliers.html"    class="nav-item" data-min-role="Manager"><span class="nav-icon">🏭</span> Suppliers</a>
+    <div class="nav-section-label" data-min-role="Manager">Analytics</div>
+    <a href="reports.html"      class="nav-item" data-min-role="Manager"><span class="nav-icon">📈</span> Reports</a>
+    <a href="logs.html"         class="nav-item" data-role="Admin"><span class="nav-icon">📝</span> Activity Logs</a>
+  </nav>
+  <div class="sidebar-user">
+    <div class="user-avatar" id="sidebar-user-avatar">AD</div>
+    <div class="user-info"><div class="user-name" id="sidebar-user-name">Loading…</div><div class="user-role" id="sidebar-user-role">—</div></div>
+    <button class="btn-logout" id="btn-logout" title="Logout">🚪</button>
+  </div>
+</aside>
+
+<div class="main-content">
+  <header class="top-header">
+    <button class="sidebar-toggle" id="sidebar-toggle">☰</button>
+    <div class="header-title"><h1>Dashboard</h1><p>EO Executive Optical – Inventory Management System</p></div>
+    <div class="header-actions">
+      <div class="header-time" id="live-clock"></div>
+      <button class="btn-icon" onclick="window.location.href='inventory.html'" title="Low Stock">⚠️<span class="notif-dot" id="notif-dot" style="display:none"></span></button>
+    </div>
+  </header>
+
+  <div class="page-body">
+    <div class="stats-grid">
+      <div class="stat-card" style="--stat-color:var(--primary)">
+        <div class="stat-icon-wrap">👓</div>
+        <div class="stat-info"><div class="stat-val" id="stat-units">—</div><div class="stat-label">Total Eyewear SKUs</div><div class="stat-change up" id="stat-units-sub">Loading…</div></div>
+      </div>
+      <div class="stat-card" style="--stat-color:#2ecc71">
+        <div class="stat-icon-wrap">💰</div>
+        <div class="stat-info"><div class="stat-val" id="stat-revenue">—</div><div class="stat-label">Monthly Revenue</div><div class="stat-change up" id="stat-rev-sub">Loading…</div></div>
+      </div>
+      <div class="stat-card" style="--stat-color:#3498db">
+        <div class="stat-icon-wrap">👥</div>
+        <div class="stat-info"><div class="stat-val" id="stat-customers">—</div><div class="stat-label">Total Customers</div><div class="stat-change up">Registered</div></div>
+      </div>
+      <div class="stat-card" style="--stat-color:#f39c12">
+        <div class="stat-icon-wrap">📋</div>
+        <div class="stat-info"><div class="stat-val" id="stat-rx">—</div><div class="stat-label">Prescriptions</div><div class="stat-change up">This month</div></div>
+      </div>
+    </div>
+
+    <div class="grid-2 mb-3 mt-2" data-min-role="Manager">
+      <div class="card">
+        <div class="card-header"><span class="card-title"><span class="card-title-icon">📈</span> Monthly Sales Revenue</span></div>
+        <div class="chart-container"><canvas id="salesChart"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title"><span class="card-title-icon">🥧</span> Inventory by Category</span></div>
+        <div class="chart-container"><canvas id="catChart"></canvas></div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title"><span class="card-title-icon">💰</span> Recent Sales</span>
+          <a href="sales.html" class="btn btn-secondary btn-sm">View All</a>
+        </div>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead><tr><th>Item</th><th>Customer</th><th>Amount</th><th>Date</th><th>Status</th></tr></thead>
+            <tbody id="recent-sales"><tr><td colspan="5" style="text-align:center;padding:1.5rem" class="text-muted">Loading…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title"><span class="card-title-icon">⚠️</span> Low Stock Alerts</span>
+          <a href="inventory.html" class="btn btn-secondary btn-sm">View All</a>
+        </div>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead><tr><th>Item</th><th>Category</th><th>Stock</th><th>Min</th></tr></thead>
+            <tbody id="low-stock"><tr><td colspan="4" style="text-align:center;padding:1.5rem" class="text-muted">Loading…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  import { requireAuth, logoutUser, populateSidebarUser } from './js/auth.js';
+  import { startClock, formatPeso, showToast, initSidebarToggle } from './js/app.js';
+  import { db } from './js/firebase-config.js';
+  import { collection, getDocs, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+  requireAuth(); populateSidebarUser(); startClock(); initSidebarToggle();
+  document.getElementById('btn-logout').addEventListener('click',()=>logoutUser());
+
+  Chart.defaults.color='#8C97A8'; Chart.defaults.borderColor='rgba(201,168,76,0.08)'; Chart.defaults.font.family='Inter';
+
+  const salesChart = new Chart(document.getElementById('salesChart'),{
+    type:'bar',
+    data:{ labels:['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'], datasets:[{label:'Revenue (₱)',data:Array(12).fill(0),backgroundColor:'rgba(201,168,76,0.6)',borderColor:'#C9A84C',borderWidth:1,borderRadius:5}] },
+    options:{ responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{callback:v=>'₱'+v.toLocaleString()}}} }
+  });
+
+  const catChart = new Chart(document.getElementById('catChart'),{
+    type:'doughnut',
+    data:{ labels:['Frames','Lenses','Sunglasses','Contact Lenses','Accessories'], datasets:[{data:[0,0,0,0,0],backgroundColor:['#C9A84C','#3498db','#2ecc71','#e74c3c','#9b59b6'],borderColor:'#131d2e',borderWidth:3}] },
+    options:{ responsive:true,maintainAspectRatio:false,cutout:'62%',plugins:{legend:{position:'bottom',labels:{padding:14,font:{size:11}}}} }
+  });
+
+  async function loadDashboard(){
+    try{
+      const [invSnap,custSnap,rxSnap,salesSnap] = await Promise.all([
+        getDocs(collection(db,'inventory')),
+        getDocs(collection(db,'customers')),
+        getDocs(query(collection(db,'prescriptions'),orderBy('date','desc'))),
+        getDocs(query(collection(db,'sales'),orderBy('date','desc'),limit(50)))
+      ]);
+
+      let totalUnits=0,lowCount=0;
+      const cats={'Frames':0,'Lenses':0,'Sunglasses':0,'Contact Lenses':0,'Accessories':0};
+      const lowItems=[];
+      invSnap.forEach(d=>{
+        const i=d.data(); totalUnits+=Number(i.quantity||0);
+        const c=i.category||'Frames'; if(cats[c]!==undefined) cats[c]+=Number(i.quantity||0);
+        if(Number(i.quantity)<=Number(i.minStock||5)){lowCount++;if(lowItems.length<5)lowItems.push(i);}
+      });
+      document.getElementById('stat-units').textContent=totalUnits.toLocaleString();
+      document.getElementById('stat-units-sub').textContent=invSnap.size+' SKUs tracked';
+      if(lowCount>0){document.getElementById('notif-dot').style.display='block';}
+      catChart.data.datasets[0].data=Object.values(cats); catChart.update();
+
+      document.getElementById('stat-customers').textContent=custSnap.size;
+
+      const now=new Date(), startMonth=new Date(now.getFullYear(),now.getMonth(),1);
+      let rxThisMonth=0;
+      rxSnap.forEach(d=>{ const rx=d.data(); const rxDate=rx.date?.toDate?rx.date.toDate():new Date(rx.date); if(rxDate>=startMonth) rxThisMonth++; });
+      document.getElementById('stat-rx').textContent=rxThisMonth;
+
+      let monthRev=0; const monthlyRev=Array(12).fill(0); const recentSales=[];
+      salesSnap.forEach(d=>{
+        const s=d.data(); const sd=s.date?.toDate?s.date.toDate():new Date(s.date);
+        const amt=Number(s.amount||0); if(sd>=startMonth) monthRev+=amt;
+        monthlyRev[sd.getMonth()]+=amt;
+        if(recentSales.length<5) recentSales.push(s);
+      });
+      document.getElementById('stat-revenue').textContent=formatPeso(monthRev);
+      document.getElementById('stat-rev-sub').textContent=now.toLocaleString('en-PH',{month:'long',year:'numeric'});
+      salesChart.data.datasets[0].data=monthlyRev; salesChart.update();
+
+      const lsBody=document.getElementById('low-stock');
+      lsBody.innerHTML=lowItems.length?lowItems.map(i=>`<tr><td class="fw-600">${i.name||'—'}</td><td><span class="badge badge-muted">${i.category||'—'}</span></td><td class="text-danger fw-700">${i.quantity}</td><td class="text-muted">${i.minStock||5}</td></tr>`).join(''):
+        '<tr><td colspan="4" class="text-success" style="text-align:center;padding:1rem">✅ All stock levels OK</td></tr>';
+
+      const rsBody=document.getElementById('recent-sales');
+      rsBody.innerHTML=recentSales.length?recentSales.map(s=>{
+        const sd=s.date?.toDate?s.date.toDate():new Date(s.date);
+        const bc=s.status==='Completed'?'badge-success':s.status==='Pending'?'badge-warning':'badge-danger';
+        return`<tr><td class="fw-600">${s.item||'—'}</td><td>${s.customer||'—'}</td><td class="text-gold fw-600">${formatPeso(s.amount)}</td><td class="text-secondary">${sd.toLocaleDateString('en-PH')}</td><td><span class="badge ${bc}">${s.status||'—'}</span></td></tr>`;
+      }).join(''):'<tr><td colspan="5" class="text-muted" style="text-align:center;padding:1rem">No sales yet</td></tr>';
+
+    }catch(err){ showToast('Error: '+err.message,'error'); }
+  }
+  loadDashboard();
+</script>
+</body>
+</html>

@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Activity Logs – EO Executive Optical IMS</title>
+  <link rel="stylesheet" href="css/style.css"/>
+</head>
+<body>
+<div id="toast-container" class="toast-container"></div>
+<div class="sidebar-overlay" id="sidebar-overlay"></div>
+<aside class="sidebar">
+  <div class="sidebar-header"><div class="sidebar-logo">👓</div><div class="sidebar-brand"><span class="sidebar-brand-name">EO Optical</span><span class="sidebar-brand-sub">Inventory System</span></div></div>
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">Main</div>
+    <a href="dashboard.html" class="nav-item"><span class="nav-icon">📊</span> Dashboard</a>
+    <a href="inventory.html" class="nav-item"><span class="nav-icon">👓</span> Inventory</a>
+    <a href="sales.html" class="nav-item"><span class="nav-icon">💰</span> Sales</a>
+    <div class="nav-section-label">Clinical</div>
+    <a href="prescriptions.html" class="nav-item"><span class="nav-icon">📋</span> Prescriptions</a>
+    <a href="customers.html" class="nav-item"><span class="nav-icon">👥</span> Customers</a>
+    <div class="nav-section-label">Management</div>
+    <a href="suppliers.html" class="nav-item" data-min-role="Manager"><span class="nav-icon">🏭</span> Suppliers</a>
+    <div class="nav-section-label" data-min-role="Manager">Analytics</div>
+    <a href="reports.html" class="nav-item" data-min-role="Manager"><span class="nav-icon">📈</span> Reports</a>
+    <a href="logs.html" class="nav-item active" data-role="Admin"><span class="nav-icon">📝</span> Activity Logs</a>
+  </nav>
+  <div class="sidebar-user">
+    <div class="user-avatar" id="sidebar-user-avatar">AD</div>
+    <div class="user-info"><div class="user-name" id="sidebar-user-name">Loading…</div><div class="user-role" id="sidebar-user-role">—</div></div>
+    <button class="btn-logout" id="btn-logout">🚪</button>
+  </div>
+</aside>
+
+<div class="main-content">
+  <header class="top-header">
+    <button class="sidebar-toggle" id="sidebar-toggle">☰</button>
+    <div class="header-title"><h1>Activity Logs</h1><p>Feature 7 — Full audit trail of all system actions</p></div>
+    <div class="header-actions">
+      <div class="header-time" id="live-clock"></div>
+      <button class="btn btn-secondary btn-sm" id="btn-refresh">🔄 Refresh</button>
+      <button class="btn btn-secondary btn-sm" onclick="exportTableCSV('log-table','activity-logs.csv')">⬇️ Export</button>
+    </div>
+  </header>
+  <div class="page-body">
+
+    <div id="blocked" class="blocked-page" style="display:none">
+      <div class="blocked-icon">🔒</div><h2>Admin Only</h2>
+      <p>Activity logs are restricted to Administrators.</p>
+      <a href="dashboard.html" class="btn btn-primary" style="margin-top:1.5rem;display:inline-flex">← Dashboard</a>
+    </div>
+
+    <div id="page-content">
+      <div class="stats-grid mb-3">
+        <div class="stat-card" style="--stat-color:var(--primary)"><div class="stat-icon-wrap">📝</div><div class="stat-info"><div class="stat-val" id="log-total">—</div><div class="stat-label">Total Entries</div></div></div>
+        <div class="stat-card" style="--stat-color:#2ecc71"><div class="stat-icon-wrap">👓</div><div class="stat-info"><div class="stat-val" id="log-inv">—</div><div class="stat-label">Inventory Actions</div></div></div>
+        <div class="stat-card" style="--stat-color:#f39c12"><div class="stat-icon-wrap">💰</div><div class="stat-info"><div class="stat-val" id="log-sales">—</div><div class="stat-label">Sales Actions</div></div></div>
+        <div class="stat-card" style="--stat-color:#3498db"><div class="stat-icon-wrap">🔑</div><div class="stat-info"><div class="stat-val" id="log-auth">—</div><div class="stat-label">Auth Events</div></div></div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title"><span class="card-title-icon">📝</span> Audit Trail</span>
+          <div class="flex gap-1 flex-wrap">
+            <div class="search-bar"><span class="search-icon">🔍</span><input type="text" id="log-search" placeholder="Search actions or users…"/></div>
+            <select class="select-field" id="log-mod-filter" style="width:auto">
+              <option value="">All Modules</option>
+              <option>AUTH</option><option>INVENTORY</option><option>SALES</option>
+              <option>PRESCRIPTIONS</option><option>CUSTOMERS</option><option>SUPPLIERS</option><option>SYSTEM</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="log-timeline" style="padding:0 1rem">
+          <div class="text-muted" style="text-align:center;padding:3rem">Loading…</div>
+        </div>
+
+        <!-- Hidden table for CSV export -->
+        <table class="data-table" id="log-table" style="display:none">
+          <thead><tr><th>Timestamp</th><th>Module</th><th>Action</th><th>User</th></tr></thead>
+          <tbody id="log-export-tbody"></tbody>
+        </table>
+
+        <div id="log-pagination" style="padding:1rem;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--border)"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  import { requireAuth, logoutUser, populateSidebarUser, getCachedRole } from './js/auth.js';
+  import { startClock, showToast, initSidebarToggle, exportTableCSV, Paginator } from './js/app.js';
+  import { fetchLogs, formatLogTime, getModuleBadge } from './js/logs.js';
+
+  requireAuth(); populateSidebarUser(); startClock(); initSidebarToggle();
+  document.getElementById('btn-logout').addEventListener('click',()=>logoutUser());
+  window.exportTableCSV=exportTableCSV;
+
+  let allLogs=[], paginator;
+
+  setTimeout(async()=>{
+    const role=getCachedRole();
+    if(role!=='Admin'){ document.getElementById('blocked').style.display='block'; document.getElementById('page-content').style.display='none'; return; }
+    loadLogs();
+  },800);
+
+  async function loadLogs(){
+    document.getElementById('log-timeline').innerHTML='<div class="text-muted" style="text-align:center;padding:3rem"><span class="spinner"></span> Loading…</div>';
+    try{
+      allLogs=await fetchLogs({maxCount:500});
+      document.getElementById('log-total').textContent=allLogs.length;
+      document.getElementById('log-inv').textContent=allLogs.filter(l=>l.module==='INVENTORY').length;
+      document.getElementById('log-sales').textContent=allLogs.filter(l=>l.module==='SALES').length;
+      document.getElementById('log-auth').textContent=allLogs.filter(l=>l.module==='AUTH').length;
+      applyFilters();
+    }catch(err){ showToast('Failed: '+err.message,'error'); }
+  }
+
+  function applyFilters(){
+    const s=document.getElementById('log-search').value.toLowerCase(), m=document.getElementById('log-mod-filter').value;
+    const filtered=allLogs.filter(l=>(!s||(l.action||'').toLowerCase().includes(s)||(l.userEmail||'').toLowerCase().includes(s))&&(!m||l.module===m));
+    paginator=new Paginator(filtered,30); renderPage(1);
+    document.getElementById('log-export-tbody').innerHTML=filtered.map(l=>`<tr><td>${formatLogTime(l.timestamp)}</td><td>${l.module||'—'}</td><td>${l.action||'—'}</td><td>${l.userEmail||'—'}</td></tr>`).join('');
+  }
+
+  function renderPage(n){
+    const items=paginator.getPage(n);
+    const timeline=document.getElementById('log-timeline');
+    if(!items.length){ timeline.innerHTML='<div class="empty-state"><div class="empty-icon">📭</div><p>No log entries found</p></div>'; }
+    else {
+      timeline.innerHTML=items.map(log=>{
+        const badge=getModuleBadge(log.module);
+        return`<div style="display:flex;gap:1rem;padding:0.85rem 0;border-bottom:1px solid rgba(201,168,76,0.06);align-items:flex-start">
+          <div style="font-size:1.2rem;flex-shrink:0;margin-top:2px">${badge.icon}</div>
+          <div style="flex:1;min-width:0">
+            <div style="display:flex;align-items:center;gap:0.6rem;flex-wrap:wrap;margin-bottom:3px">
+              <span class="badge ${badge.cls}">${log.module||'SYSTEM'}</span>
+              <span style="font-size:0.875rem;color:var(--text-primary)">${log.action||'—'}</span>
+            </div>
+            <div style="display:flex;gap:1rem;font-size:0.73rem;color:var(--text-muted);flex-wrap:wrap">
+              <span>👤 ${log.userEmail||'system'}</span>
+              <span>🕐 ${formatLogTime(log.timestamp)}</span>
+            </div>
+          </div>
+        </div>`;
+      }).join('');
+    }
+    paginator.renderControls('log-pagination',renderPage);
+  }
+
+  document.getElementById('log-search').addEventListener('input',applyFilters);
+  document.getElementById('log-mod-filter').addEventListener('change',applyFilters);
+  document.getElementById('btn-refresh').addEventListener('click',loadLogs);
+</script>
+</body>
+</html>

@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Prescriptions – EO Executive Optical IMS</title>
+  <link rel="stylesheet" href="css/style.css"/>
+</head>
+<body>
+<div id="toast-container" class="toast-container"></div>
+<div class="sidebar-overlay" id="sidebar-overlay"></div>
+<aside class="sidebar">
+  <div class="sidebar-header"><div class="sidebar-logo">👓</div><div class="sidebar-brand"><span class="sidebar-brand-name">EO Optical</span><span class="sidebar-brand-sub">Inventory System</span></div></div>
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">Main</div>
+    <a href="dashboard.html" class="nav-item"><span class="nav-icon">📊</span> Dashboard</a>
+    <a href="inventory.html" class="nav-item"><span class="nav-icon">👓</span> Inventory</a>
+    <a href="sales.html" class="nav-item"><span class="nav-icon">💰</span> Sales</a>
+    <div class="nav-section-label">Clinical</div>
+    <a href="prescriptions.html" class="nav-item active"><span class="nav-icon">📋</span> Prescriptions</a>
+    <a href="customers.html" class="nav-item"><span class="nav-icon">👥</span> Customers</a>
+    <div class="nav-section-label">Management</div>
+    <a href="suppliers.html" class="nav-item" data-min-role="Manager"><span class="nav-icon">🏭</span> Suppliers</a>
+    <div class="nav-section-label" data-min-role="Manager">Analytics</div>
+    <a href="reports.html" class="nav-item" data-min-role="Manager"><span class="nav-icon">📈</span> Reports</a>
+    <a href="logs.html" class="nav-item" data-role="Admin"><span class="nav-icon">📝</span> Activity Logs</a>
+  </nav>
+  <div class="sidebar-user">
+    <div class="user-avatar" id="sidebar-user-avatar">AD</div>
+    <div class="user-info"><div class="user-name" id="sidebar-user-name">Loading…</div><div class="user-role" id="sidebar-user-role">—</div></div>
+    <button class="btn-logout" id="btn-logout">🚪</button>
+  </div>
+</aside>
+
+<div class="main-content">
+  <header class="top-header">
+    <button class="sidebar-toggle" id="sidebar-toggle">☰</button>
+    <div class="header-title"><h1>Prescriptions</h1><p>Feature 3 — Optical prescriptions and eye exam records</p></div>
+    <div class="header-actions"><div class="header-time" id="live-clock"></div></div>
+  </header>
+  <div class="page-body">
+    <div class="stats-grid mb-3">
+      <div class="stat-card" style="--stat-color:var(--primary)"><div class="stat-icon-wrap">📋</div><div class="stat-info"><div class="stat-val" id="rx-total">—</div><div class="stat-label">Total Prescriptions</div></div></div>
+      <div class="stat-card" style="--stat-color:#2ecc71"><div class="stat-icon-wrap">📅</div><div class="stat-info"><div class="stat-val" id="rx-month">—</div><div class="stat-label">This Month</div></div></div>
+      <div class="stat-card" style="--stat-color:#3498db"><div class="stat-icon-wrap">👥</div><div class="stat-info"><div class="stat-val" id="rx-patients">—</div><div class="stat-label">Unique Patients</div></div></div>
+      <div class="stat-card" style="--stat-color:#9b59b6"><div class="stat-icon-wrap">🔬</div><div class="stat-info"><div class="stat-val" id="rx-optometrists">—</div><div class="stat-label">Optometrists</div></div></div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title"><span class="card-title-icon">📋</span> Prescription Records</span>
+        <div class="flex gap-1 flex-wrap">
+          <div class="search-bar"><span class="search-icon">🔍</span><input type="text" id="rx-search" placeholder="Search by patient…"/></div>
+          <button class="btn btn-secondary btn-sm" onclick="exportTableCSV('rx-table','prescriptions.csv')">⬇️ Export</button>
+          <button class="btn btn-primary btn-sm" id="btn-add-rx">+ New Prescription</button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table class="data-table" id="rx-table">
+          <thead>
+            <tr><th>#</th><th>Patient Name</th><th>Date</th><th>OD (Right)</th><th>OS (Left)</th><th>PD</th><th>Optometrist</th><th>Remarks</th><th>Actions</th></tr>
+          </thead>
+          <tbody id="rx-tbody"><tr><td colspan="9" style="text-align:center;padding:2rem" class="text-muted">Loading…</td></tr></tbody>
+        </table>
+      </div>
+      <div id="rx-pagination" style="padding:1rem;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--border)"></div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="rx-modal">
+  <div class="modal" style="max-width:640px">
+    <div class="modal-header"><h3 id="rx-modal-title">New Prescription</h3><button class="modal-close" id="rx-close">✕</button></div>
+    <div class="modal-body">
+      <input type="hidden" id="rx-edit-id"/>
+      <div class="form-grid">
+        <div class="input-group"><label class="input-label">Patient Name *</label><input class="input-field" id="rx-patient" placeholder="Full name"/></div>
+        <div class="input-group"><label class="input-label">Date *</label><input class="input-field" type="date" id="rx-date"/></div>
+        <div class="input-group"><label class="input-label">Optometrist</label><input class="input-field" id="rx-optometrist" placeholder="Dr. Juan dela Cruz"/></div>
+        <div class="input-group"><label class="input-label">Contact #</label><input class="input-field" id="rx-contact" placeholder="09XXXXXXXXX"/></div>
+      </div>
+
+      <!-- OD (Right Eye) -->
+      <div style="margin:1rem 0 0.5rem;padding:0.75rem 1rem;background:rgba(201,168,76,0.05);border:1px solid var(--border);border-radius:var(--radius-md)">
+        <div style="font-size:0.8rem;font-weight:700;color:var(--primary);text-transform:uppercase;letter-spacing:1px;margin-bottom:0.75rem">👁️ OD — Right Eye</div>
+        <div class="form-grid-3">
+          <div class="input-group"><label class="input-label">Sphere</label><input class="input-field" id="od-sph" placeholder="-1.00"/></div>
+          <div class="input-group"><label class="input-label">Cylinder</label><input class="input-field" id="od-cyl" placeholder="-0.50"/></div>
+          <div class="input-group"><label class="input-label">Axis</label><input class="input-field" id="od-axis" placeholder="180"/></div>
+        </div>
+      </div>
+
+      <!-- OS (Left Eye) -->
+      <div style="margin:0 0 1rem;padding:0.75rem 1rem;background:rgba(52,152,219,0.05);border:1px solid rgba(52,152,219,0.15);border-radius:var(--radius-md)">
+        <div style="font-size:0.8rem;font-weight:700;color:#3498db;text-transform:uppercase;letter-spacing:1px;margin-bottom:0.75rem">👁️ OS — Left Eye</div>
+        <div class="form-grid-3">
+          <div class="input-group"><label class="input-label">Sphere</label><input class="input-field" id="os-sph" placeholder="-1.00"/></div>
+          <div class="input-group"><label class="input-label">Cylinder</label><input class="input-field" id="os-cyl" placeholder="-0.50"/></div>
+          <div class="input-group"><label class="input-label">Axis</label><input class="input-field" id="os-axis" placeholder="180"/></div>
+        </div>
+      </div>
+
+      <div class="form-grid">
+        <div class="input-group"><label class="input-label">PD (mm)</label><input class="input-field" id="rx-pd" placeholder="62"/></div>
+        <div class="input-group"><label class="input-label">ADD (Reading)</label><input class="input-field" id="rx-add" placeholder="+1.50"/></div>
+        <div class="input-group" style="grid-column:1/-1"><label class="input-label">Remarks / Recommendations</label><textarea class="textarea-field" id="rx-remarks" placeholder="Recommended lenses, follow-up notes…"></textarea></div>
+      </div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-secondary" id="rx-cancel">Cancel</button><button class="btn btn-primary" id="rx-save">💾 Save Prescription</button></div>
+  </div>
+</div>
+
+<script type="module">
+  import { requireAuth, logoutUser, populateSidebarUser } from './js/auth.js';
+  import { startClock, showToast, initSidebarToggle, exportTableCSV, Paginator } from './js/app.js';
+  import { logActivity } from './js/logs.js';
+  import { db } from './js/firebase-config.js';
+  import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc, orderBy, query, serverTimestamp, Timestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+  requireAuth(); populateSidebarUser(); startClock(); initSidebarToggle();
+  document.getElementById('btn-logout').addEventListener('click',()=>logoutUser());
+  window.exportTableCSV=exportTableCSV;
+  document.getElementById('rx-date').value=new Date().toISOString().split('T')[0];
+
+  let allRx=[], paginator;
+
+  async function loadRx(){
+    const snap=await getDocs(query(collection(db,'prescriptions'),orderBy('date','desc')));
+    allRx=snap.docs.map(d=>({id:d.id,...d.data()}));
+    applyFilters();
+    const now=new Date(),startMonth=new Date(now.getFullYear(),now.getMonth(),1);
+    let month=0; const patients=new Set(), optometrists=new Set();
+    allRx.forEach(r=>{ const d=r.date?.toDate?r.date.toDate():new Date(r.date); if(d>=startMonth) month++; patients.add(r.patient); if(r.optometrist) optometrists.add(r.optometrist); });
+    document.getElementById('rx-total').textContent=allRx.length;
+    document.getElementById('rx-month').textContent=month;
+    document.getElementById('rx-patients').textContent=patients.size;
+    document.getElementById('rx-optometrists').textContent=optometrists.size;
+  }
+
+  function applyFilters(){
+    const s=document.getElementById('rx-search').value.toLowerCase();
+    const f=allRx.filter(r=>!s||(r.patient||'').toLowerCase().includes(s)||(r.optometrist||'').toLowerCase().includes(s));
+    paginator=new Paginator(f,15); renderPage(1);
+  }
+
+  function formatRx(sph,cyl,axis){ if(!sph&&!cyl) return '—'; return `${sph||'0.00'} / ${cyl||'0.00'} x${axis||'—'}`; }
+
+  function renderPage(n){
+    const items=paginator.getPage(n);
+    document.getElementById('rx-tbody').innerHTML=items.length?items.map((r,i)=>{
+      const date=r.date?.toDate?r.date.toDate():new Date(r.date);
+      return`<tr>
+        <td class="text-muted">${(paginator.current-1)*15+i+1}</td>
+        <td class="fw-600">${r.patient||'—'}</td>
+        <td class="text-secondary">${date.toLocaleDateString('en-PH')}</td>
+        <td style="font-family:monospace;font-size:0.8rem">${formatRx(r.odSph,r.odCyl,r.odAxis)}</td>
+        <td style="font-family:monospace;font-size:0.8rem">${formatRx(r.osSph,r.osCyl,r.osAxis)}</td>
+        <td class="text-secondary">${r.pd||'—'}</td>
+        <td class="text-secondary">${r.optometrist||'—'}</td>
+        <td class="text-muted" style="max-width:150px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r.remarks||'—'}</td>
+        <td><button class="btn btn-secondary btn-sm" onclick="editRx('${r.id}')">✏️</button> <button class="btn btn-danger btn-sm" onclick="delRx('${r.id}','${(r.patient||'').replace(/'/g,"\\'")}')">🗑️</button></td>
+      </tr>`;
+    }).join(''):'<tr><td colspan="9" style="text-align:center;padding:2rem" class="text-muted">No prescriptions found</td></tr>';
+    paginator.renderControls('rx-pagination',renderPage);
+  }
+
+  const modal=document.getElementById('rx-modal');
+  const openM=()=>modal.classList.add('show');
+  const closeM=()=>{ modal.classList.remove('show'); ['rx-edit-id','rx-patient','rx-optometrist','rx-contact','od-sph','od-cyl','od-axis','os-sph','os-cyl','os-axis','rx-pd','rx-add','rx-remarks'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';}); document.getElementById('rx-date').value=new Date().toISOString().split('T')[0]; document.getElementById('rx-modal-title').textContent='New Prescription'; };
+
+  document.getElementById('btn-add-rx').addEventListener('click',openM);
+  document.getElementById('rx-close').addEventListener('click',closeM);
+  document.getElementById('rx-cancel').addEventListener('click',closeM);
+  modal.addEventListener('click',e=>{if(e.target===modal)closeM();});
+
+  document.getElementById('rx-save').addEventListener('click',async()=>{
+    const patient=document.getElementById('rx-patient').value.trim(), dateVal=document.getElementById('rx-date').value;
+    if(!patient||!dateVal){showToast('Patient name and date are required.','warning');return;}
+    const editId=document.getElementById('rx-edit-id').value;
+    const data={patient,date:Timestamp.fromDate(new Date(dateVal)),optometrist:document.getElementById('rx-optometrist').value.trim(),contact:document.getElementById('rx-contact').value.trim(),odSph:document.getElementById('od-sph').value.trim(),odCyl:document.getElementById('od-cyl').value.trim(),odAxis:document.getElementById('od-axis').value.trim(),osSph:document.getElementById('os-sph').value.trim(),osCyl:document.getElementById('os-cyl').value.trim(),osAxis:document.getElementById('os-axis').value.trim(),pd:document.getElementById('rx-pd').value.trim(),add:document.getElementById('rx-add').value.trim(),remarks:document.getElementById('rx-remarks').value.trim(),updatedAt:serverTimestamp()};
+    try{
+      if(editId){await updateDoc(doc(db,'prescriptions',editId),data);await logActivity('PRESCRIPTIONS',`Updated Rx for: ${patient}`);showToast('Updated.','success');}
+      else{data.createdAt=serverTimestamp();await addDoc(collection(db,'prescriptions'),data);await logActivity('PRESCRIPTIONS',`New Rx for: ${patient}`);showToast('Prescription saved.','success');}
+      closeM(); loadRx();
+    }catch(err){showToast('Error: '+err.message,'error');}
+  });
+
+  window.editRx=function(id){
+    const r=allRx.find(x=>x.id===id);if(!r)return;
+    const date=r.date?.toDate?r.date.toDate():new Date(r.date);
+    document.getElementById('rx-edit-id').value=id;
+    document.getElementById('rx-patient').value=r.patient||'';
+    document.getElementById('rx-date').value=date.toISOString().split('T')[0];
+    document.getElementById('rx-optometrist').value=r.optometrist||'';
+    document.getElementById('rx-contact').value=r.contact||'';
+    document.getElementById('od-sph').value=r.odSph||'';
+    document.getElementById('od-cyl').value=r.odCyl||'';
+    document.getElementById('od-axis').value=r.odAxis||'';
+    document.getElementById('os-sph').value=r.osSph||'';
+    document.getElementById('os-cyl').value=r.osCyl||'';
+    document.getElementById('os-axis').value=r.osAxis||'';
+    document.getElementById('rx-pd').value=r.pd||'';
+    document.getElementById('rx-add').value=r.add||'';
+    document.getElementById('rx-remarks').value=r.remarks||'';
+    document.getElementById('rx-modal-title').textContent='Edit Prescription';
+    openM();
+  };
+
+  window.delRx=async function(id,patient){
+    if(!confirm(`Delete prescription for "${patient}"?`))return;
+    try{await deleteDoc(doc(db,'prescriptions',id));await logActivity('PRESCRIPTIONS',`Deleted Rx for: ${patient}`);showToast('Deleted.','success');loadRx();}
+    catch(err){showToast('Error: '+err.message,'error');}
+  };
+
+  document.getElementById('rx-search').addEventListener('input',applyFilters);
+  loadRx();
+</script>
+</body>
+</html>

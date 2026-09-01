@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Customers – EO Executive Optical IMS</title>
+  <link rel="stylesheet" href="css/style.css"/>
+</head>
+<body>
+<div id="toast-container" class="toast-container"></div>
+<div class="sidebar-overlay" id="sidebar-overlay"></div>
+<aside class="sidebar">
+  <div class="sidebar-header"><div class="sidebar-logo">👓</div><div class="sidebar-brand"><span class="sidebar-brand-name">EO Optical</span><span class="sidebar-brand-sub">Inventory System</span></div></div>
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">Main</div>
+    <a href="dashboard.html" class="nav-item"><span class="nav-icon">📊</span> Dashboard</a>
+    <a href="inventory.html" class="nav-item"><span class="nav-icon">👓</span> Inventory</a>
+    <a href="sales.html" class="nav-item"><span class="nav-icon">💰</span> Sales</a>
+    <div class="nav-section-label">Clinical</div>
+    <a href="prescriptions.html" class="nav-item"><span class="nav-icon">📋</span> Prescriptions</a>
+    <a href="customers.html" class="nav-item active"><span class="nav-icon">👥</span> Customers</a>
+    <div class="nav-section-label">Management</div>
+    <a href="suppliers.html" class="nav-item" data-min-role="Manager"><span class="nav-icon">🏭</span> Suppliers</a>
+    <div class="nav-section-label" data-min-role="Manager">Analytics</div>
+    <a href="reports.html" class="nav-item" data-min-role="Manager"><span class="nav-icon">📈</span> Reports</a>
+    <a href="logs.html" class="nav-item" data-role="Admin"><span class="nav-icon">📝</span> Activity Logs</a>
+  </nav>
+  <div class="sidebar-user">
+    <div class="user-avatar" id="sidebar-user-avatar">AD</div>
+    <div class="user-info"><div class="user-name" id="sidebar-user-name">Loading…</div><div class="user-role" id="sidebar-user-role">—</div></div>
+    <button class="btn-logout" id="btn-logout">🚪</button>
+  </div>
+</aside>
+
+<div class="main-content">
+  <header class="top-header">
+    <button class="sidebar-toggle" id="sidebar-toggle">☰</button>
+    <div class="header-title"><h1>Customer Management</h1><p>Feature 4 — Patient and customer database</p></div>
+    <div class="header-actions"><div class="header-time" id="live-clock"></div></div>
+  </header>
+  <div class="page-body">
+    <div class="stats-grid mb-3">
+      <div class="stat-card" style="--stat-color:var(--primary)"><div class="stat-icon-wrap">👥</div><div class="stat-info"><div class="stat-val" id="c-total">—</div><div class="stat-label">Total Customers</div></div></div>
+      <div class="stat-card" style="--stat-color:#2ecc71"><div class="stat-icon-wrap">✅</div><div class="stat-info"><div class="stat-val" id="c-active">—</div><div class="stat-label">Active</div></div></div>
+      <div class="stat-card" style="--stat-color:#3498db"><div class="stat-icon-wrap">📅</div><div class="stat-info"><div class="stat-val" id="c-new">—</div><div class="stat-label">New This Month</div></div></div>
+      <div class="stat-card" style="--stat-color:#9b59b6"><div class="stat-icon-wrap">📋</div><div class="stat-info"><div class="stat-val" id="c-with-rx">—</div><div class="stat-label">With Prescriptions</div></div></div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title"><span class="card-title-icon">👥</span> Customer Database</span>
+        <div class="flex gap-1 flex-wrap">
+          <div class="search-bar"><span class="search-icon">🔍</span><input type="text" id="c-search" placeholder="Search customers…"/></div>
+          <button class="btn btn-secondary btn-sm" onclick="exportTableCSV('c-table','customers.csv')">⬇️ Export</button>
+          <button class="btn btn-primary btn-sm" id="btn-add-c">+ Add Customer</button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table class="data-table" id="c-table">
+          <thead><tr><th>#</th><th>Full Name</th><th>Email</th><th>Phone</th><th>Date of Birth</th><th>Address</th><th>Registered</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="c-tbody"><tr><td colspan="9" style="text-align:center;padding:2rem" class="text-muted">Loading…</td></tr></tbody>
+        </table>
+      </div>
+      <div id="c-pagination" style="padding:1rem;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--border)"></div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="c-modal">
+  <div class="modal">
+    <div class="modal-header"><h3 id="c-modal-title">Add Customer</h3><button class="modal-close" id="c-close">✕</button></div>
+    <div class="modal-body">
+      <input type="hidden" id="c-edit-id"/>
+      <div class="form-grid">
+        <div class="input-group"><label class="input-label">First Name *</label><input class="input-field" id="c-fname" placeholder="Juan"/></div>
+        <div class="input-group"><label class="input-label">Last Name *</label><input class="input-field" id="c-lname" placeholder="dela Cruz"/></div>
+        <div class="input-group"><label class="input-label">Email</label><input class="input-field" type="email" id="c-email" placeholder="juan@email.com"/></div>
+        <div class="input-group"><label class="input-label">Phone Number</label><input class="input-field" id="c-phone" placeholder="09XXXXXXXXX"/></div>
+        <div class="input-group"><label class="input-label">Date of Birth</label><input class="input-field" type="date" id="c-dob"/></div>
+        <div class="input-group"><label class="input-label">Gender</label><select class="select-field" id="c-gender"><option value="">—</option><option>Male</option><option>Female</option><option>Prefer not to say</option></select></div>
+        <div class="input-group" style="grid-column:1/-1"><label class="input-label">Address</label><input class="input-field" id="c-address" placeholder="Complete address"/></div>
+        <div class="input-group"><label class="input-label">Status</label><select class="select-field" id="c-status"><option>Active</option><option>Inactive</option></select></div>
+        <div class="input-group" style="grid-column:1/-1"><label class="input-label">Notes</label><textarea class="textarea-field" id="c-notes" placeholder="Medical history, allergies, special notes…"></textarea></div>
+      </div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-secondary" id="c-cancel">Cancel</button><button class="btn btn-primary" id="c-save">💾 Save Customer</button></div>
+  </div>
+</div>
+
+<script type="module">
+  import { requireAuth, logoutUser, populateSidebarUser } from './js/auth.js';
+  import { startClock, showToast, initSidebarToggle, exportTableCSV, Paginator } from './js/app.js';
+  import { logActivity } from './js/logs.js';
+  import { db } from './js/firebase-config.js';
+  import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc, orderBy, query, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+  requireAuth(); populateSidebarUser(); startClock(); initSidebarToggle();
+  document.getElementById('btn-logout').addEventListener('click',()=>logoutUser());
+  window.exportTableCSV=exportTableCSV;
+
+  let allCustomers=[], allRx=[], paginator;
+
+  async function loadCustomers(){
+    const [custSnap,rxSnap]=await Promise.all([getDocs(query(collection(db,'customers'),orderBy('lastName'))),getDocs(collection(db,'prescriptions'))]);
+    allCustomers=custSnap.docs.map(d=>({id:d.id,...d.data()}));
+    const patientsWithRx=new Set(rxSnap.docs.map(d=>d.data().patient));
+    applyFilters();
+    const now=new Date(),startMonth=new Date(now.getFullYear(),now.getMonth(),1);
+    let newThisMonth=0,withRx=0;
+    allCustomers.forEach(c=>{
+      const created=c.createdAt?.toDate?c.createdAt.toDate():new Date(c.createdAt||0);
+      if(created>=startMonth) newThisMonth++;
+      if(patientsWithRx.has(`${c.firstName} ${c.lastName}`)) withRx++;
+    });
+    document.getElementById('c-total').textContent=allCustomers.length;
+    document.getElementById('c-active').textContent=allCustomers.filter(c=>c.status==='Active').length;
+    document.getElementById('c-new').textContent=newThisMonth;
+    document.getElementById('c-with-rx').textContent=withRx;
+  }
+
+  function applyFilters(){
+    const s=document.getElementById('c-search').value.toLowerCase();
+    const f=allCustomers.filter(c=>!s||(c.firstName||'').toLowerCase().includes(s)||(c.lastName||'').toLowerCase().includes(s)||(c.email||'').toLowerCase().includes(s)||(c.phone||'').includes(s));
+    paginator=new Paginator(f,15); renderPage(1);
+  }
+
+  function renderPage(n){
+    const items=paginator.getPage(n);
+    document.getElementById('c-tbody').innerHTML=items.length?items.map((c,i)=>{
+      const created=c.createdAt?.toDate?c.createdAt.toDate().toLocaleDateString('en-PH'):'—';
+      return`<tr>
+        <td class="text-muted">${(paginator.current-1)*15+i+1}</td>
+        <td class="fw-600">${c.firstName||''} ${c.lastName||''}</td>
+        <td class="text-secondary">${c.email||'—'}</td>
+        <td class="text-secondary">${c.phone||'—'}</td>
+        <td class="text-secondary">${c.dob||'—'}</td>
+        <td class="text-muted" style="max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${c.address||'—'}</td>
+        <td class="text-muted">${created}</td>
+        <td><span class="badge ${c.status==='Active'?'badge-success':'badge-warning'}">${c.status||'Active'}</span></td>
+        <td><button class="btn btn-secondary btn-sm" onclick="editCustomer('${c.id}')">✏️</button> <button class="btn btn-danger btn-sm" onclick="delCustomer('${c.id}','${(c.firstName||'').replace(/'/g,"\\'")}')">🗑️</button></td>
+      </tr>`;
+    }).join(''):'<tr><td colspan="9" style="text-align:center;padding:2rem" class="text-muted">No customers found</td></tr>';
+    paginator.renderControls('c-pagination',renderPage);
+  }
+
+  const modal=document.getElementById('c-modal');
+  const openM=()=>modal.classList.add('show');
+  const closeM=()=>{ modal.classList.remove('show'); ['c-edit-id','c-fname','c-lname','c-email','c-phone','c-dob','c-address','c-notes'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';}); document.getElementById('c-gender').value=''; document.getElementById('c-status').value='Active'; document.getElementById('c-modal-title').textContent='Add Customer'; };
+
+  document.getElementById('btn-add-c').addEventListener('click',openM);
+  document.getElementById('c-close').addEventListener('click',closeM);
+  document.getElementById('c-cancel').addEventListener('click',closeM);
+  modal.addEventListener('click',e=>{if(e.target===modal)closeM();});
+
+  document.getElementById('c-save').addEventListener('click',async()=>{
+    const fname=document.getElementById('c-fname').value.trim(),lname=document.getElementById('c-lname').value.trim();
+    if(!fname||!lname){showToast('First and last name are required.','warning');return;}
+    const editId=document.getElementById('c-edit-id').value;
+    const data={firstName:fname,lastName:lname,email:document.getElementById('c-email').value.trim(),phone:document.getElementById('c-phone').value.trim(),dob:document.getElementById('c-dob').value,gender:document.getElementById('c-gender').value,address:document.getElementById('c-address').value.trim(),status:document.getElementById('c-status').value,notes:document.getElementById('c-notes').value.trim(),updatedAt:serverTimestamp()};
+    try{
+      if(editId){await updateDoc(doc(db,'customers',editId),data);await logActivity('CUSTOMERS',`Updated: ${fname} ${lname}`);showToast('Updated.','success');}
+      else{data.createdAt=serverTimestamp();await addDoc(collection(db,'customers'),data);await logActivity('CUSTOMERS',`Added customer: ${fname} ${lname}`);showToast('Customer added.','success');}
+      closeM(); loadCustomers();
+    }catch(err){showToast('Error: '+err.message,'error');}
+  });
+
+  window.editCustomer=function(id){
+    const c=allCustomers.find(x=>x.id===id);if(!c)return;
+    document.getElementById('c-edit-id').value=id;
+    document.getElementById('c-fname').value=c.firstName||'';
+    document.getElementById('c-lname').value=c.lastName||'';
+    document.getElementById('c-email').value=c.email||'';
+    document.getElementById('c-phone').value=c.phone||'';
+    document.getElementById('c-dob').value=c.dob||'';
+    document.getElementById('c-gender').value=c.gender||'';
+    document.getElementById('c-address').value=c.address||'';
+    document.getElementById('c-status').value=c.status||'Active';
+    document.getElementById('c-notes').value=c.notes||'';
+    document.getElementById('c-modal-title').textContent=`Edit — ${c.firstName} ${c.lastName}`;
+    openM();
+  };
+
+  window.delCustomer=async function(id,name){
+    if(!confirm(`Delete customer "${name}"?`))return;
+    try{await deleteDoc(doc(db,'customers',id));await logActivity('CUSTOMERS',`Deleted: ${name}`);showToast('Deleted.','success');loadCustomers();}
+    catch(err){showToast('Error: '+err.message,'error');}
+  };
+
+  document.getElementById('c-search').addEventListener('input',applyFilters);
+  loadCustomers();
+</script>
+</body>
+</html>

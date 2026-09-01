@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Register – EO Executive Optical</title>
+  <link rel="stylesheet" href="css/style.css"/>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👓</text></svg>"/>
+</head>
+<body>
+<div class="login-page">
+  <div class="login-brand">
+    <div class="login-brand-grid"></div>
+    <div class="brand-logo-wrap">
+      <div class="brand-logo-icon">👓</div>
+      <div class="brand-name">EO</div>
+      <div class="brand-sub">Executive Optical</div>
+    </div>
+    <div class="brand-divider"></div>
+    <div class="brand-tagline">
+      <strong>Create Your Account</strong>
+      Register as Staff, Optometrist, or Manager to access the EO Optical Inventory System.
+    </div>
+    <div class="brand-stats">
+      <div class="brand-stat"><div class="brand-stat-val">🔒</div><div class="brand-stat-lbl">Secure</div></div>
+      <div class="brand-stat"><div class="brand-stat-val">✅</div><div class="brand-stat-lbl">Verified</div></div>
+      <div class="brand-stat"><div class="brand-stat-val">📧</div><div class="brand-stat-lbl">OTP Login</div></div>
+    </div>
+  </div>
+
+  <div class="login-form-panel">
+    <div class="login-box">
+
+      <div id="step-register">
+        <div class="login-box-header">
+          <h2>Create Account</h2>
+          <p>Staff, Optometrist, or Manager accounts</p>
+        </div>
+        <div class="login-error" id="reg-error" style="display:none">⚠️ <span id="reg-error-msg"></span></div>
+        <form id="reg-form" novalidate>
+          <div class="form-group">
+            <label class="form-label">Full Name *</label>
+            <div class="form-input-wrap">
+              <input class="form-input" type="text" id="reg-name" placeholder="Juan dela Cruz"/>
+              <span class="form-input-icon">👤</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email Address *</label>
+            <div class="form-input-wrap">
+              <input class="form-input" type="email" id="reg-email" placeholder="juan@eooptical.com"/>
+              <span class="form-input-icon">✉️</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Role *</label>
+            <div class="form-input-wrap">
+              <select class="form-input" id="reg-role" style="padding-left:2.8rem">
+                <option value="">-- Select Role --</option>
+                <option value="Staff">Staff</option>
+                <option value="Optometrist">Optometrist</option>
+                <option value="Manager">Manager</option>
+              </select>
+              <span class="form-input-icon">🏷️</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Password *</label>
+            <div class="form-input-wrap">
+              <input class="form-input" type="password" id="reg-password" placeholder="Minimum 6 characters"/>
+              <span class="form-input-icon">🔒</span>
+              <button type="button" class="toggle-password" id="toggle-pw1">👁️</button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Confirm Password *</label>
+            <div class="form-input-wrap">
+              <input class="form-input" type="password" id="reg-confirm" placeholder="Re-enter password"/>
+              <span class="form-input-icon">🔒</span>
+              <button type="button" class="toggle-password" id="toggle-pw2">👁️</button>
+            </div>
+          </div>
+          <div style="margin-bottom:1.25rem">
+            <div style="display:flex;justify-content:space-between;font-size:0.75rem;color:var(--text-muted);margin-bottom:4px">
+              <span>Password strength</span><span id="pw-lbl" style="color:var(--text-muted)">—</span>
+            </div>
+            <div class="progress-bar"><div class="progress-fill" id="pw-bar" style="width:0%"></div></div>
+          </div>
+          <button type="submit" class="btn-login" id="btn-register">Create Account</button>
+        </form>
+        <div style="text-align:center;margin-top:1.5rem;font-size:0.85rem;color:var(--text-secondary)">
+          Already have an account? <a href="index.html" style="color:var(--primary);font-weight:600">Sign In →</a>
+        </div>
+      </div>
+
+      <div id="step-otp" style="display:none">
+        <div class="login-box-header"><h2>Verify Email 📧</h2><p id="otp-desc">Enter the 6-digit code</p></div>
+        <div class="login-error" id="otp-error" style="display:none">⚠️ <span id="otp-error-msg"></span></div>
+        <div style="text-align:center;margin:1.5rem 0">
+          <div style="font-size:3rem">📨</div>
+          <p style="color:var(--text-secondary);font-size:0.85rem;margin-top:0.5rem">Expires in <span id="otp-countdown" style="color:var(--primary);font-weight:700">10:00</span></p>
+        </div>
+        <div class="form-group">
+          <label class="form-label">OTP Code</label>
+          <input class="form-input" type="text" id="otp-code" placeholder="123456" maxlength="6" inputmode="numeric"
+            style="text-align:center;font-size:2rem;font-weight:800;letter-spacing:12px;padding:1rem"/>
+        </div>
+        <button class="btn-login" id="btn-verify">✅ Verify & Create Account</button>
+        <div style="text-align:center;margin-top:1rem;font-size:0.84rem">
+          <button id="btn-resend" type="button" style="background:none;border:none;color:var(--primary);cursor:pointer">🔁 Resend Code</button>
+          &nbsp;|&nbsp;
+          <button id="btn-back" type="button" style="background:none;border:none;color:var(--text-secondary);cursor:pointer">← Back</button>
+        </div>
+      </div>
+
+      <div id="step-success" style="display:none;text-align:center;padding:2rem 0">
+        <div style="font-size:4rem;margin-bottom:1rem">🎉</div>
+        <h2 style="color:var(--success);margin-bottom:0.5rem;font-family:'Playfair Display',serif">Account Created!</h2>
+        <p style="color:var(--text-secondary);margin-bottom:2rem">Your account is ready. Sign in to get started.</p>
+        <a href="index.html" class="btn-login" style="display:block;text-align:center">Go to Login →</a>
+      </div>
+
+      <div class="login-footer" style="margin-top:2rem">&copy; 2026 EO Executive Optical</div>
+    </div>
+  </div>
+</div>
+<div class="toast-container" id="toast-container"></div>
+<script type="module">
+  import { auth, db }      from './js/firebase-config.js';
+  import { showToast }     from './js/app.js';
+  import { registerUser, getBasePath } from './js/auth.js';
+  import { onAuthStateChanged }        from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+  onAuthStateChanged(auth,(user)=>{ if(user) window.location.replace(getBasePath()+'dashboard.html'); });
+
+  const OTP_KEY='eo_otp',OTP_EMAIL='eo_otp_email',OTP_EXPIRY='eo_otp_expiry';
+  function genOTP(){ return Math.floor(100000+Math.random()*900000).toString(); }
+  async function sendOTP(email,name){
+    const otp=genOTP();
+    sessionStorage.setItem(OTP_KEY,otp); sessionStorage.setItem(OTP_EMAIL,email); sessionStorage.setItem(OTP_EXPIRY,Date.now()+10*60*1000);
+    await loadEJS();
+    await emailjs.send('YOUR_EMAILJS_SERVICE_ID','YOUR_EMAILJS_TEMPLATE_ID',{to_email:email,to_name:name||email.split('@')[0],otp_code:otp},'YOUR_EMAILJS_PUBLIC_KEY');
+  }
+  function verifyOTP(code,email){
+    const saved=sessionStorage.getItem(OTP_KEY),savedEmail=sessionStorage.getItem(OTP_EMAIL),expiry=parseInt(sessionStorage.getItem(OTP_EXPIRY)||0);
+    if(!saved) return{valid:false,reason:'No OTP. Request again.'};
+    if(Date.now()>expiry) return{valid:false,reason:'OTP expired.'};
+    if(savedEmail!==email) return{valid:false,reason:'Email mismatch.'};
+    if(code.trim()!==saved) return{valid:false,reason:'Incorrect OTP.'};
+    [OTP_KEY,OTP_EMAIL,OTP_EXPIRY].forEach(k=>sessionStorage.removeItem(k));
+    return{valid:true};
+  }
+  function loadEJS(){
+    return new Promise((res,rej)=>{
+      if(window.emailjs){res();return;}
+      const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js';s.onload=res;s.onerror=()=>rej(new Error('EmailJS failed'));document.head.appendChild(s);
+    });
+  }
+  function showErr(id,msgId,msg){ const b=document.getElementById(id); document.getElementById(msgId).textContent=msg; b.style.display='block'; b.classList.add('show'); }
+  function hideErr(id){ const b=document.getElementById(id); b.style.display='none'; b.classList.remove('show'); }
+
+  document.getElementById('toggle-pw1').addEventListener('click',()=>{ const p=document.getElementById('reg-password'),b=document.getElementById('toggle-pw1'); p.type=p.type==='text'?'password':'text'; b.textContent=p.type==='text'?'🙈':'👁️'; });
+  document.getElementById('toggle-pw2').addEventListener('click',()=>{ const p=document.getElementById('reg-confirm'),b=document.getElementById('toggle-pw2'); p.type=p.type==='text'?'password':'text'; b.textContent=p.type==='text'?'🙈':'👁️'; });
+
+  document.getElementById('reg-password').addEventListener('input',e=>{
+    const v=e.target.value,bar=document.getElementById('pw-bar'),lbl=document.getElementById('pw-lbl');
+    let s=0; if(v.length>=6)s++; if(v.length>=10)s++; if(/[A-Z]/.test(v))s++; if(/[0-9]/.test(v))s++; if(/[^A-Za-z0-9]/.test(v))s++;
+    const lvl=[{w:'0%',c:'var(--danger)',l:'—'},{w:'25%',c:'var(--danger)',l:'Weak'},{w:'50%',c:'var(--warning)',l:'Fair'},{w:'75%',c:'var(--warning)',l:'Good'},{w:'90%',c:'var(--success)',l:'Strong'},{w:'100%',c:'var(--success)',l:'Very Strong'}][Math.min(s,5)];
+    bar.style.width=lvl.w; bar.style.background=lvl.c; lbl.textContent=lvl.l; lbl.style.color=lvl.c;
+  });
+
+  let pendingEmail='',pendingName='',pendingRole='',pendingPw='',countdownTimer;
+
+  document.getElementById('reg-form').addEventListener('submit',async e=>{
+    e.preventDefault(); hideErr('reg-error');
+    const name=document.getElementById('reg-name').value.trim();
+    const email=document.getElementById('reg-email').value.trim();
+    const role=document.getElementById('reg-role').value;
+    const pw=document.getElementById('reg-password').value;
+    const confirm=document.getElementById('reg-confirm').value;
+    if(!name){showErr('reg-error','reg-error-msg','Full name is required.');return;}
+    if(!email||!email.includes('@')){showErr('reg-error','reg-error-msg','Valid email is required.');return;}
+    if(!role){showErr('reg-error','reg-error-msg','Please select a role.');return;}
+    if(!pw||pw.length<6){showErr('reg-error','reg-error-msg','Password must be at least 6 characters.');return;}
+    if(pw!==confirm){showErr('reg-error','reg-error-msg','Passwords do not match.');return;}
+    const btn=document.getElementById('btn-register'); btn.disabled=true; btn.innerHTML='<span class="spinner"></span> Sending OTP…';
+    try{
+      await sendOTP(email,name);
+      pendingEmail=email; pendingName=name; pendingRole=role; pendingPw=pw;
+      document.getElementById('step-register').style.display='none';
+      document.getElementById('step-otp').style.display='block';
+      document.getElementById('otp-desc').textContent=`Code sent to ${email}`;
+      startCountdown(600); showToast('OTP sent! Check your email.','success');
+    }catch(err){ showErr('reg-error','reg-error-msg','Failed to send OTP: '+err.message); btn.disabled=false; btn.innerHTML='Create Account'; }
+  });
+
+  document.getElementById('btn-verify').addEventListener('click',async()=>{
+    hideErr('otp-error');
+    const code=document.getElementById('otp-code').value.trim();
+    if(!code||code.length<6){showErr('otp-error','otp-error-msg','Enter the 6-digit code.');return;}
+    const result=verifyOTP(code,pendingEmail);
+    if(!result.valid){showErr('otp-error','otp-error-msg',result.reason);return;}
+    const btn=document.getElementById('btn-verify'); btn.disabled=true; btn.innerHTML='<span class="spinner"></span> Creating…';
+    try{
+      await registerUser(pendingEmail,pendingPw,pendingName,pendingRole);
+      clearInterval(countdownTimer);
+      document.getElementById('step-otp').style.display='none';
+      document.getElementById('step-success').style.display='block';
+      showToast('Account created!','success');
+    }catch(err){
+      let msg=err.message;
+      if(err.code==='auth/email-already-in-use') msg='This email is already registered.';
+      showErr('otp-error','otp-error-msg',msg); btn.disabled=false; btn.innerHTML='✅ Verify & Create Account';
+    }
+  });
+
+  document.getElementById('btn-resend').addEventListener('click',async()=>{
+    if(!pendingEmail)return;
+    try{ await sendOTP(pendingEmail,pendingName); startCountdown(600); document.getElementById('otp-code').value=''; showToast('New code sent!','success'); }
+    catch(err){ showToast('Failed: '+err.message,'error'); }
+  });
+
+  document.getElementById('btn-back').addEventListener('click',()=>{
+    clearInterval(countdownTimer);
+    document.getElementById('step-otp').style.display='none';
+    document.getElementById('step-register').style.display='block';
+    const btn=document.getElementById('btn-register'); btn.disabled=false; btn.innerHTML='Create Account';
+  });
+
+  document.getElementById('otp-code').addEventListener('input',e=>{ e.target.value=e.target.value.replace(/\D/g,'').substring(0,6); });
+
+  function startCountdown(seconds){
+    clearInterval(countdownTimer); let remaining=seconds;
+    const el=document.getElementById('otp-countdown');
+    const tick=()=>{
+      if(remaining<=0){clearInterval(countdownTimer);if(el){el.textContent='Expired ❌';el.style.color='var(--danger)';}return;}
+      const m=Math.floor(remaining/60).toString().padStart(2,'0'),s=(remaining%60).toString().padStart(2,'0');
+      if(el) el.textContent=`${m}:${s}`; remaining--;
+    };
+    tick(); countdownTimer=setInterval(tick,1000);
+  }
+</script>
+</body>
+</html>

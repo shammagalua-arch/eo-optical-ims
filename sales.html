@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sales – EO Executive Optical IMS</title>
+  <link rel="stylesheet" href="css/style.css"/>
+</head>
+<body>
+<div id="toast-container" class="toast-container"></div>
+<div class="sidebar-overlay" id="sidebar-overlay"></div>
+<aside class="sidebar">
+  <div class="sidebar-header"><div class="sidebar-logo">👓</div><div class="sidebar-brand"><span class="sidebar-brand-name">EO Optical</span><span class="sidebar-brand-sub">Inventory System</span></div></div>
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">Main</div>
+    <a href="dashboard.html" class="nav-item"><span class="nav-icon">📊</span> Dashboard</a>
+    <a href="inventory.html" class="nav-item"><span class="nav-icon">👓</span> Inventory</a>
+    <a href="sales.html" class="nav-item active"><span class="nav-icon">💰</span> Sales</a>
+    <div class="nav-section-label">Clinical</div>
+    <a href="prescriptions.html" class="nav-item"><span class="nav-icon">📋</span> Prescriptions</a>
+    <a href="customers.html" class="nav-item"><span class="nav-icon">👥</span> Customers</a>
+    <div class="nav-section-label">Management</div>
+    <a href="suppliers.html" class="nav-item" data-min-role="Manager"><span class="nav-icon">🏭</span> Suppliers</a>
+    <div class="nav-section-label" data-min-role="Manager">Analytics</div>
+    <a href="reports.html" class="nav-item" data-min-role="Manager"><span class="nav-icon">📈</span> Reports</a>
+    <a href="logs.html" class="nav-item" data-role="Admin"><span class="nav-icon">📝</span> Activity Logs</a>
+  </nav>
+  <div class="sidebar-user">
+    <div class="user-avatar" id="sidebar-user-avatar">AD</div>
+    <div class="user-info"><div class="user-name" id="sidebar-user-name">Loading…</div><div class="user-role" id="sidebar-user-role">—</div></div>
+    <button class="btn-logout" id="btn-logout">🚪</button>
+  </div>
+</aside>
+
+<div class="main-content">
+  <header class="top-header">
+    <button class="sidebar-toggle" id="sidebar-toggle">☰</button>
+    <div class="header-title"><h1>Sales Tracking</h1><p>Feature 2 — Record and monitor all sales transactions</p></div>
+    <div class="header-actions"><div class="header-time" id="live-clock"></div></div>
+  </header>
+  <div class="page-body">
+    <div class="stats-grid mb-3">
+      <div class="stat-card" style="--stat-color:#2ecc71"><div class="stat-icon-wrap">💰</div><div class="stat-info"><div class="stat-val" id="s-total-rev">—</div><div class="stat-label">Total Revenue</div></div></div>
+      <div class="stat-card" style="--stat-color:var(--primary)"><div class="stat-icon-wrap">🛒</div><div class="stat-info"><div class="stat-val" id="s-total-tx">—</div><div class="stat-label">Transactions</div></div></div>
+      <div class="stat-card" style="--stat-color:#3498db"><div class="stat-icon-wrap">📅</div><div class="stat-info"><div class="stat-val" id="s-month-rev">—</div><div class="stat-label">This Month</div></div></div>
+      <div class="stat-card" style="--stat-color:#f39c12"><div class="stat-icon-wrap">⏳</div><div class="stat-info"><div class="stat-val" id="s-pending">—</div><div class="stat-label">Pending</div></div></div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title"><span class="card-title-icon">💰</span> Sales Records</span>
+        <div class="flex gap-1 flex-wrap">
+          <div class="search-bar"><span class="search-icon">🔍</span><input type="text" id="s-search" placeholder="Search…"/></div>
+          <select class="select-field" id="s-status-filter" style="width:auto"><option value="">All Status</option><option>Completed</option><option>Pending</option><option>Cancelled</option></select>
+          <button class="btn btn-secondary btn-sm" onclick="exportTableCSV('s-table','sales.csv')">⬇️ Export</button>
+          <button class="btn btn-primary btn-sm" id="btn-add-sale">+ Record Sale</button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table class="data-table" id="s-table">
+          <thead><tr><th>#</th><th>Item Sold</th><th>Customer</th><th>Contact</th><th>Amount</th><th>Payment</th><th>OR #</th><th>Date</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="s-tbody"><tr><td colspan="10" style="text-align:center;padding:2rem" class="text-muted">Loading…</td></tr></tbody>
+        </table>
+      </div>
+      <div id="s-pagination" style="padding:1rem;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--border)"></div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="s-modal">
+  <div class="modal">
+    <div class="modal-header"><h3 id="s-modal-title">Record New Sale</h3><button class="modal-close" id="s-close">✕</button></div>
+    <div class="modal-body">
+      <input type="hidden" id="s-edit-id"/>
+      <div class="form-grid">
+        <div class="input-group"><label class="input-label">Item Sold *</label><input class="input-field" id="s-item" placeholder="e.g. Ray-Ban Aviator"/></div>
+        <div class="input-group"><label class="input-label">Customer Name *</label><input class="input-field" id="s-customer" placeholder="Full name"/></div>
+        <div class="input-group"><label class="input-label">Contact Number</label><input class="input-field" id="s-contact" placeholder="09XXXXXXXXX"/></div>
+        <div class="input-group"><label class="input-label">Amount (₱) *</label><input class="input-field" type="number" id="s-amount" min="0" step="0.01" placeholder="0.00"/></div>
+        <div class="input-group"><label class="input-label">Payment Method</label><select class="select-field" id="s-payment"><option>Cash</option><option>GCash</option><option>Maya</option><option>Credit Card</option><option>Debit Card</option><option>Installment</option></select></div>
+        <div class="input-group"><label class="input-label">OR Number</label><input class="input-field" id="s-or" placeholder="Official Receipt #"/></div>
+        <div class="input-group"><label class="input-label">Date *</label><input class="input-field" type="date" id="s-date"/></div>
+        <div class="input-group"><label class="input-label">Status</label><select class="select-field" id="s-status"><option>Completed</option><option>Pending</option><option>Cancelled</option></select></div>
+        <div class="input-group" style="grid-column:1/-1"><label class="input-label">Notes</label><textarea class="textarea-field" id="s-notes" placeholder="Optional notes…"></textarea></div>
+      </div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-secondary" id="s-cancel">Cancel</button><button class="btn btn-primary" id="s-save">💾 Save Sale</button></div>
+  </div>
+</div>
+
+<script type="module">
+  import { requireAuth, logoutUser, populateSidebarUser } from './js/auth.js';
+  import { startClock, showToast, initSidebarToggle, exportTableCSV, formatPeso, Paginator } from './js/app.js';
+  import { logActivity } from './js/logs.js';
+  import { db } from './js/firebase-config.js';
+  import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc, orderBy, query, serverTimestamp, Timestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+  requireAuth(); populateSidebarUser(); startClock(); initSidebarToggle();
+  document.getElementById('btn-logout').addEventListener('click',()=>logoutUser());
+  window.exportTableCSV=exportTableCSV;
+  document.getElementById('s-date').value=new Date().toISOString().split('T')[0];
+
+  let allSales=[], paginator;
+
+  async function loadSales(){
+    const snap=await getDocs(query(collection(db,'sales'),orderBy('date','desc')));
+    allSales=snap.docs.map(d=>({id:d.id,...d.data()}));
+    applyFilters();
+    const now=new Date(),startMonth=new Date(now.getFullYear(),now.getMonth(),1);
+    let totalRev=0,monthRev=0,pending=0;
+    allSales.forEach(s=>{ const amt=Number(s.amount||0),date=s.date?.toDate?s.date.toDate():new Date(s.date); totalRev+=amt; if(date>=startMonth) monthRev+=amt; if(s.status==='Pending') pending++; });
+    document.getElementById('s-total-rev').textContent=formatPeso(totalRev);
+    document.getElementById('s-total-tx').textContent=allSales.length;
+    document.getElementById('s-month-rev').textContent=formatPeso(monthRev);
+    document.getElementById('s-pending').textContent=pending;
+  }
+
+  function applyFilters(){
+    const s=document.getElementById('s-search').value.toLowerCase(),st=document.getElementById('s-status-filter').value;
+    const f=allSales.filter(x=>(!s||(x.item||'').toLowerCase().includes(s)||(x.customer||'').toLowerCase().includes(s))&&(!st||x.status===st));
+    paginator=new Paginator(f,15); renderPage(1);
+  }
+
+  function renderPage(n){
+    const items=paginator.getPage(n);
+    document.getElementById('s-tbody').innerHTML=items.length?items.map((s,i)=>{
+      const date=s.date?.toDate?s.date.toDate():new Date(s.date);
+      const bc=s.status==='Completed'?'badge-success':s.status==='Pending'?'badge-warning':'badge-danger';
+      return`<tr>
+        <td class="text-muted">${(paginator.current-1)*15+i+1}</td>
+        <td class="fw-600">${s.item||'—'}</td><td>${s.customer||'—'}</td>
+        <td class="text-secondary">${s.contact||'—'}</td>
+        <td class="fw-700 text-gold">${formatPeso(s.amount)}</td>
+        <td class="text-secondary">${s.payment||'—'}</td>
+        <td class="text-muted">${s.or||'—'}</td>
+        <td class="text-secondary">${date.toLocaleDateString('en-PH')}</td>
+        <td><span class="badge ${bc}">${s.status||'—'}</span></td>
+        <td><button class="btn btn-secondary btn-sm" onclick="editSale('${s.id}')">✏️</button> <button class="btn btn-danger btn-sm" onclick="delSale('${s.id}','${(s.item||'').replace(/'/g,"\\'")}')">🗑️</button></td>
+      </tr>`;
+    }).join(''):'<tr><td colspan="10" style="text-align:center;padding:2rem" class="text-muted">No sales found</td></tr>';
+    paginator.renderControls('s-pagination',renderPage);
+  }
+
+  const modal=document.getElementById('s-modal');
+  const openM=()=>modal.classList.add('show');
+  const closeM=()=>{ modal.classList.remove('show'); ['s-edit-id','s-item','s-customer','s-contact','s-amount','s-or','s-notes'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';}); document.getElementById('s-date').value=new Date().toISOString().split('T')[0]; document.getElementById('s-status').value='Completed'; document.getElementById('s-modal-title').textContent='Record New Sale'; };
+
+  document.getElementById('btn-add-sale').addEventListener('click',openM);
+  document.getElementById('s-close').addEventListener('click',closeM);
+  document.getElementById('s-cancel').addEventListener('click',closeM);
+  modal.addEventListener('click',e=>{if(e.target===modal)closeM();});
+
+  document.getElementById('s-save').addEventListener('click',async()=>{
+    const item=document.getElementById('s-item').value.trim(),customer=document.getElementById('s-customer').value.trim(),amount=document.getElementById('s-amount').value,dateVal=document.getElementById('s-date').value;
+    if(!item||!customer||!amount||!dateVal){showToast('Item, customer, amount, and date are required.','warning');return;}
+    const editId=document.getElementById('s-edit-id').value;
+    const data={item,customer,contact:document.getElementById('s-contact').value.trim(),amount:Number(amount),payment:document.getElementById('s-payment').value,or:document.getElementById('s-or').value.trim(),date:Timestamp.fromDate(new Date(dateVal)),status:document.getElementById('s-status').value,notes:document.getElementById('s-notes').value.trim(),updatedAt:serverTimestamp()};
+    try{
+      if(editId){await updateDoc(doc(db,'sales',editId),data);await logActivity('SALES',`Updated sale: ${item}`);showToast('Updated.','success');}
+      else{data.createdAt=serverTimestamp();await addDoc(collection(db,'sales'),data);await logActivity('SALES',`Recorded sale: ${item} for ${customer}`);showToast('Sale recorded.','success');}
+      closeM(); loadSales();
+    }catch(err){showToast('Error: '+err.message,'error');}
+  });
+
+  window.editSale=function(id){
+    const s=allSales.find(x=>x.id===id);if(!s)return;
+    const date=s.date?.toDate?s.date.toDate():new Date(s.date);
+    document.getElementById('s-edit-id').value=id;
+    document.getElementById('s-item').value=s.item||'';
+    document.getElementById('s-customer').value=s.customer||'';
+    document.getElementById('s-contact').value=s.contact||'';
+    document.getElementById('s-amount').value=s.amount||'';
+    document.getElementById('s-payment').value=s.payment||'Cash';
+    document.getElementById('s-or').value=s.or||'';
+    document.getElementById('s-date').value=date.toISOString().split('T')[0];
+    document.getElementById('s-status').value=s.status||'Completed';
+    document.getElementById('s-notes').value=s.notes||'';
+    document.getElementById('s-modal-title').textContent='Edit Sale';
+    openM();
+  };
+
+  window.delSale=async function(id,item){
+    if(!confirm(`Delete sale of "${item}"?`))return;
+    try{await deleteDoc(doc(db,'sales',id));await logActivity('SALES',`Deleted sale: ${item}`);showToast('Deleted.','success');loadSales();}
+    catch(err){showToast('Error: '+err.message,'error');}
+  };
+
+  document.getElementById('s-search').addEventListener('input',applyFilters);
+  document.getElementById('s-status-filter').addEventListener('change',applyFilters);
+  loadSales();
+</script>
+</body>
+</html>
